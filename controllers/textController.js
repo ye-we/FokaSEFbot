@@ -1,4 +1,4 @@
-const { getStudents } = require("../utils/utils");
+const { getStudents, downloadPhotos } = require("../utils/utils");
 
 module.exports = {
   async handleText(ctx) {
@@ -9,6 +9,7 @@ module.exports = {
     if (!student) {
       return ctx.reply("Please provide a valid code.");
     }
-    return ctx.reply(`Hello, ${student[1]}, getting your pics..`);
+
+    const res = await downloadPhotos(userCode, ctx);
   },
 };
