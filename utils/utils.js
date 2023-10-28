@@ -2,10 +2,10 @@ const { google } = require("googleapis");
 const { GoogleAuth } = require("google-auth-library");
 const apikeys = require("../apikeys.json");
 const fs = require("fs");
-const { default: axios } = require("axios");
-
+const { log, Console } = require("console");
 const spreadsheetId = process.env.SPERADSHEETID;
 let students = [];
+const sharp = require("sharp");
 
 async function authorize() {
   const SCOPE = ["https://www.googleapis.com/auth/drive"];
@@ -17,6 +17,12 @@ async function authorize() {
   );
   await jwtClient.authorize();
   return jwtClient;
+}
+function slugify(str) {
+  return str
+    .toLowerCase()
+    .replace(/ /g, "-") // replaces all spaces with hyphens.
+    .replace(/--+/g, "-"); // collapses any consecutive hyphens into a single hyphen.
 }
 
 module.exports = {
@@ -41,7 +47,6 @@ module.exports = {
   setStudents: (value) => {
     students = value;
   },
-
   async downloadPhotos(code, ctx) {
     try {
       const client = await authorize();
@@ -53,41 +58,86 @@ module.exports = {
       const studentFolder = subFolders.find((student) =>
         student.name.startsWith(code.trim().toUpperCase())
       );
+      let album = [];
       const imagesResponse = await drive.files.list({
         q: `'${studentFolder.id}' in parents and mimeType='image/jpeg'`,
       });
       const imageFiles = imagesResponse.data.files;
       ctx.reply(`Uploading ${imageFiles.length} photos...⌛`);
+      fs.mkdir(`./images/${code}`, (err) => {
+        if (err) {
+          console.error(`Error creating folder: ${err}`);
+        }
+      });
+      fs.mkdir(`./images/${code}/resized`, (err) => {
+        if (err) {
+          console.error(`Error creating folder: ${err}`);
+        }
+      });
+      let i = 0;
       for (const imageFile of imageFiles) {
-        // Download the image
         const imageContent = await drive.files.get(
           { fileId: imageFile.id, alt: "media" },
           { responseType: "stream" }
         );
-        console.log(imageContent);
-        // const imageUrl = imageContent.data.webContentLink;
-        // console.log(imageUrl);
-        // const response = await axios.get(imageUrl, { responseType: "stream" });
-        // console.log(response);
-        // const chatId = ctx.update.message.chat.id;
-        // await ctx.telegram.sendPhoto(chatId, { source: response.data });
 
-        const destPath = `./images/${imageFile.name}`;
+        const destPath = `./images/${code}/${slugify(imageFile.name)}`;
         const destStream = fs.createWriteStream(destPath);
-        imageContent.data.pipe(destStream);
+        await imageContent.data.pipe(destStream);
 
-        // Close the write stream to finish downloading the image
         await new Promise((resolve, reject) => {
           destStream.on("finish", resolve);
           destStream.on("error", reject);
         });
-        const imageStream = fs.createReadStream(`./images/${imageFile.name}`);
-        const chatId = ctx.update.message.chat.id;
-        try {
-          await ctx.telegram.sendPhoto(chatId, { source: imageStream });
-        } catch (e) {
-          continue;
-        }
+
+        sharp(destPath)
+          .resize(4600, 4400)
+          .toFile(
+            `./images/${code}/resized/${slugify(imageFile.name)}`,
+            async (err, info) => {
+              if (err) {
+                console.error("Error resizing image:", err);
+              } else {
+                console.log("Image resized successfully.");
+                const imageStream = fs.createReadStream(
+                  `./images/${code}/resized/${slugify(imageFile.name)}`
+                );
+
+                album.push({
+                  type: "photo",
+                  media: { source: imageStream },
+                  caption:
+                    i == imageFiles.length - 1
+                      ? `Here's your dedicated photo album on google drive: \n https://drive.google.com/drive/folders/${studentFolder.id}`
+                      : "",
+                });
+                if (i == imageFiles.length - 1) {
+                  console.log("here");
+                  const chatId = ctx.update.message.chat.id;
+                  await ctx.telegram.sendMediaGroup(chatId, album);
+                  fs.rmdir(`./images/${code}`, { recursive: true }, (err) => {
+                    if (err) {
+                      console.error(`Error deleting folder: ${err}`);
+                    } else {
+                      console.log(`Folder and its contents deleted.`);
+                    }
+                  });
+                  fs.rmdir(
+                    `./images/${code}/resized`,
+                    { recursive: true },
+                    (err) => {
+                      if (err) {
+                        console.error(`Error deleting folder: ${err}`);
+                      } else {
+                        console.log(`Folder and its contents deleted.`);
+                      }
+                    }
+                  );
+                }
+                i += 1;
+              }
+            }
+          );
       }
     } catch (e) {
       console.log(e);

@@ -3,7 +3,7 @@ const { loadFromSheets, getStudents } = require("../utils/utils");
 module.exports = {
   async handleStart(ctx) {
     ctx.reply(
-      "Hello, SEF2023 student, I'm here to provide you with your photos. Could you please share your 6-digit code with me?"
+      "Hello! Interested in viewing the fantastic photos captured of you during SEF2023? Please share your unique 6-digit code to access them."
     );
   },
 };
