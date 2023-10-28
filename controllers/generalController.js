@@ -1,3 +1,5 @@
+const { loadFromSheets, getStudents } = require("../utils/utils");
+
 module.exports = {
   async handleStart(ctx) {
     ctx.reply(
