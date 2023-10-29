@@ -1,5 +1,6 @@
 const { google } = require("googleapis");
-const fs = require("fs");
+const fs = require("fs").promises;
+const util = require("util");
 const spreadsheetId = process.env.SPERADSHEETID;
 let students = [];
 const sharp = require("sharp");
