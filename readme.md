@@ -47,7 +47,7 @@ First, make sure that you have the following installed on your machine:
    - PARENT_FOLDER: The google drive folder id you want to make as a root for this project, watch [this](https://youtu.be/bkaQTLCBBeo) for more information
 4. Get your credential for google drive api access, watch [this](https://youtu.be/bkaQTLCBBeo) for more information
 5. Get your credential for google sheets api access, watch [this](https://youtu.be/PFJNJQCU_lo) for more information
-6. Start your app using `npm start`
+6. Start your app by running `npm start` script from your terminal
 
 ### Important Scripts
 
