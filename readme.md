@@ -1,4 +1,4 @@
-# FokaSEFbot
+# 📸 FokaSEFbot
 
 <div align="center">
   <a href="https://t.me/FokaSEFbot">
@@ -18,7 +18,6 @@
 
 ## About the project
 
-📸 FokaSEFbot
 Rediscover your SEF2023 memories effortlessly. Relive the cherished moments of SEF2023 using your 6-Digit-Code here. Waiting are unforgettable experiences and captured memories to be relished
 
 ### Tech Stack
