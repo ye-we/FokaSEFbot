@@ -22,6 +22,7 @@ bot.on("text", (ctx) => textController.handleText(ctx));
 bot
   .launch()
   .then(async () => {
+    // When the bot first launches, fetch the student data from google-sheets and save it in memory
     const data = await loadFromSheets();
     setStudents(data);
   })
