@@ -2,14 +2,32 @@ const { getStudents, downloadPhotos } = require("../utils/utils");
 
 module.exports = {
   async handleText(ctx) {
-    const userCode = ctx.update.message.text;
-    const student = getStudents().find(
-      (student) => student[0] == userCode?.toUpperCase()
-    );
-    if (!student) {
-      return ctx.reply("Please provide a valid 6 Digit Code.");
+    const userId = ctx.from.id;
+    const userText = ctx.update.message.text;
+    let currentUser = ctx.session[userId];
+    if (!currentUser) {
+      ctx.session[userId] = {};
+      ctx.session[userId].step = 1;
     }
-    ctx.reply(`Hey there, ${student[1].split(" ")[0]}!`);
-    const res = await downloadPhotos(userCode, ctx);
+    if (ctx.session[userId].step == 1) {
+      const student = getStudents().find(
+        (student) => student[0] == userText?.toUpperCase()
+      );
+      if (!student) {
+        return ctx.reply("Please provide a valid 6 Digit Code.");
+      }
+      ctx.session[userId].name = student[1];
+      ctx.session[userId].code = userText.toUpperCase();
+      ctx.session[userId].step += 1;
+      return ctx.reply("Hey there, can you provide your grand father's name?");
+    } else if (ctx.session[userId].step == 2) {
+      const student = ctx.session[userId];
+      if (student.name.split(" ")[2] == userText.toUpperCase()) {
+        ctx.reply(
+          `Getting your awesome photos, ${student.name.split(" ")[0]}!`
+        );
+        const res = await downloadPhotos(student.code, ctx);
+      }
+    }
   },
 };
