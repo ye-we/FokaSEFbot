@@ -27,6 +27,17 @@ module.exports = {
     }
     return chunkedArray;
   },
+  capitalizeString(inputString) {
+    // Check if the input is a valid string
+    if (typeof inputString !== "string" || inputString.length === 0) {
+      return inputString;
+    }
+
+    // Capitalize the first letter and concatenate with the rest of the string
+    return (
+      inputString.charAt(0).toUpperCase() + inputString.slice(1).toLowerCase()
+    );
+  },
   getStudents: () => students,
   setStudents: (value) => {
     students = value;

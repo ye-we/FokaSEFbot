@@ -5,7 +5,15 @@ module.exports = {
     // Clear the session data for the user.
     ctx.session[userId] = undefined;
     ctx.reply(
-      "Hello! Interested in viewing the fantastic photos captured of you during SEF2023? Please share your unique 6-digit code to access them."
+      `
+      👋 Hey,
+
+Looking to access your gorgeous photos? 
+
+Just send me your 6-digit code, and I'll retrieve them for you right away.
+
+Memories are waiting ...
+      `
     );
   },
 };

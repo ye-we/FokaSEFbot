@@ -1,5 +1,5 @@
 const { downloadPhotos } = require("../services/google_service");
-const { getStudents } = require("../utils/utils");
+const { getStudents, capitalizeString } = require("../utils/utils");
 
 module.exports = {
   // Handler for when any text is sent to the bot
@@ -25,8 +25,10 @@ module.exports = {
       ctx.session[userId].name = student[1];
       ctx.session[userId].code = userText.toUpperCase();
       ctx.session[userId].step += 1;
-      return ctx.reply(
-        "Hey there, can you provide your grand father's name as written on your certificate?"
+      return ctx.replyWithHTML(
+        `
+        👊 Got it. As a confirmation that this is really you, let you send your Grand Father's name <i>(exactly as it appears on your certificate).</i>
+        `
       );
     }
     // If the user has provided their code and grand father's name
@@ -35,7 +37,9 @@ module.exports = {
       // Check if the provided grand father name is valid (checked against the student data loaded from google-sheets)
       if (student.name.split(" ")[2] == userText.toUpperCase()) {
         ctx.reply(
-          `Getting your awesome photos, ${student.name.split(" ")[0]}!`
+          `📸 Getting your awesome photos, ${capitalizeString(
+            student.name.split(" ")[0]
+          )}!`
         );
         // Clear the session for the user
         ctx.session[userId] = undefined;

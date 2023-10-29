@@ -97,7 +97,12 @@ module.exports = {
                   media: { source: imageStream },
                   caption:
                     i == imageFiles.length - 1
-                      ? `<a href='https://drive.google.com/drive/folders/${studentFolder.id}'>Here's</a> your dedicated high quality photo album.`
+                      ? `
+                      🎉 Here they are! Resized a bit but, fresh like they were taken yesterday.
+
+Click here <a href='https://drive.google.com/drive/folders/${studentFolder.id}'>here</a> to get them in their original high quality version from your dedicated Photo Album.
+                      
+                      `
                       : "",
                   parse_mode: "HTML",
                 });
