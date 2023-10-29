@@ -4,6 +4,7 @@ const spreadsheetId = process.env.SPERADSHEETID;
 let students = [];
 const sharp = require("sharp");
 const { authorize, slugify, chunkArray } = require("../utils/utils");
+const mkdirAsync = util.promisify(fs.mkdir);
 
 module.exports = {
   async loadFromSheets() {
@@ -50,17 +51,9 @@ module.exports = {
       });
       const imageFiles = imagesResponse.data.files;
       // Create a folder to store the raw images
-      fs.mkdir(`./images/${code}`, (err) => {
-        if (err) {
-          console.error(`Error creating folder: ${err}`);
-        }
-      });
+      await mkdirAsync(`./images/${code}`);
       // Create a folder to store resized version of the images
-      fs.mkdir(`./images/${code}/resized`, (err) => {
-        if (err) {
-          console.error(`Error creating folder: ${err}`);
-        }
-      });
+      await mkdirAsync(`./images/${code}/resized`);
       let i = 0;
       for (const imageFile of imageFiles) {
         // Get streamable image content
