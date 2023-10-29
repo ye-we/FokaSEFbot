@@ -24,6 +24,13 @@ function slugify(str) {
     .replace(/ /g, "-") // replaces all spaces with hyphens.
     .replace(/--+/g, "-"); // collapses any consecutive hyphens into a single hyphen.
 }
+function chunkArray(arr, chunkSize) {
+  const chunkedArray = [];
+  for (let i = 0; i < arr.length; i += chunkSize) {
+    chunkedArray.push(arr.slice(i, i + chunkSize));
+  }
+  return chunkedArray;
+}
 
 module.exports = {
   async loadFromSheets() {
@@ -114,7 +121,10 @@ module.exports = {
                 if (i == imageFiles.length - 1) {
                   console.log("here");
                   const chatId = ctx.update.message.chat.id;
-                  await ctx.telegram.sendMediaGroup(chatId, album);
+                  const groupedArray = chunkArray(album, 10);
+                  for (let i = 0; i < groupedArray.length; i++) {
+                    await ctx.telegram.sendMediaGroup(chatId, groupedArray[i]);
+                  }
                   fs.rmdir(`./images/${code}`, { recursive: true }, (err) => {
                     if (err) {
                       console.error(`Error deleting folder: ${err}`);
