@@ -100,7 +100,7 @@ module.exports = {
                       ? `
                       🎉 Here they are! Resized a bit but, fresh like they were taken yesterday.
 
-Click here <a href='https://drive.google.com/drive/folders/${studentFolder.id}'>here</a> to get them in their original high quality version from your dedicated Photo Album.
+Click <a href='https://drive.google.com/drive/folders/${studentFolder.id}'>here</a> to get them in their original high quality version from your dedicated Photo Album.
                       
                       `
                       : "",
