@@ -1,11 +1,12 @@
 const { google } = require("googleapis");
-const fs = require("fs").promises;
+const fs = require("fs");
+const fsPromise = require("fs").promises;
 const util = require("util");
 const spreadsheetId = process.env.SPERADSHEETID;
 let students = [];
 const sharp = require("sharp");
 const { authorize, slugify, chunkArray } = require("../utils/utils");
-const mkdirAsync = util.promisify(fs.mkdir);
+const mkdirAsync = util.promisify(fsPromise.mkdir);
 
 module.exports = {
   async loadFromSheets() {
