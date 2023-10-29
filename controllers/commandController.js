@@ -1,5 +1,3 @@
-const { loadFromSheets, getStudents } = require("../utils/utils");
-
 module.exports = {
   async handleStart(ctx) {
     const userId = ctx.from.id;

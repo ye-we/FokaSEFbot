@@ -2,9 +2,10 @@ const { Telegraf } = require("telegraf");
 const session = require("telegraf/session");
 require("dotenv").config();
 // Controllers import
-const generalController = require("./controllers/generalController");
-const { loadFromSheets, setStudents } = require("./utils/utils");
+const generalController = require("./controllers/commandController");
+const { setStudents } = require("./utils/utils");
 const textController = require("./controllers/textController");
+const { loadFromSheets } = require("./services/google_service");
 const bot = new Telegraf(process.env.TOKEN);
 // Middlewares
 bot.use(session());

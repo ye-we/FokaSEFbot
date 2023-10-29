@@ -1,4 +1,5 @@
-const { getStudents, downloadPhotos } = require("../utils/utils");
+const { downloadPhotos } = require("../services/google_service");
+const { getStudents } = require("../utils/utils");
 
 module.exports = {
   async handleText(ctx) {
