@@ -56,6 +56,7 @@ module.exports = {
   },
   async downloadPhotos(code, ctx) {
     try {
+      console.log(ctx.message);
       const client = await authorize();
       const drive = google.drive({ version: "v3", auth: client });
       const subfoldersResponse = await drive.files.list({
@@ -70,7 +71,7 @@ module.exports = {
         q: `'${studentFolder.id}' in parents and mimeType='image/jpeg'`,
       });
       const imageFiles = imagesResponse.data.files;
-      ctx.reply(`Uploading ${imageFiles.length} photos...⌛`);
+      // ctx.reply();
       fs.mkdir(`./images/${code}`, (err) => {
         if (err) {
           console.error(`Error creating folder: ${err}`);
@@ -105,7 +106,6 @@ module.exports = {
               if (err) {
                 console.error("Error resizing image:", err);
               } else {
-                console.log("Image resized successfully.");
                 const imageStream = fs.createReadStream(
                   `./images/${code}/resized/${slugify(imageFile.name)}`
                 );
@@ -115,11 +115,21 @@ module.exports = {
                   media: { source: imageStream },
                   caption:
                     i == imageFiles.length - 1
-                      ? `Here's your dedicated photo album on google drive: \n https://drive.google.com/drive/folders/${studentFolder.id}`
+                      ? `<a href='https://drive.google.com/drive/folders/${studentFolder.id}'>Here's</a> your dedicated high quality photo album on google drive.`
                       : "",
+                  parse_mode: "HTML",
                 });
+                await ctx.telegram.editMessageText(
+                  ctx.chat.id,
+                  ctx.message.message_id + 1,
+                  null,
+                  `Uploading [${i + 1} / ${imageFiles.length}] photos...⌛`
+                );
                 if (i == imageFiles.length - 1) {
-                  console.log("here");
+                  await ctx.telegram.deleteMessage(
+                    ctx.chat.id,
+                    ctx.message.message_id + 1
+                  );
                   const chatId = ctx.update.message.chat.id;
                   const groupedArray = chunkArray(album, 10);
                   for (let i = 0; i < groupedArray.length; i++) {
