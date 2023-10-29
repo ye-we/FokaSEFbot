@@ -63,82 +63,89 @@ module.exports = {
       });
       let i = 0;
       for (const imageFile of imageFiles) {
-        // Get streamable image content
-        const imageContent = await drive.files.get(
-          { fileId: imageFile.id, alt: "media" },
-          { responseType: "stream" }
-        );
-        // Download and store the raw image
-        const destPath = `./images/${code}/${slugify(imageFile.name)}`;
-        const destStream = fs.createWriteStream(destPath);
-        await imageContent.data.pipe(destStream);
+        try {
+          // Get streamable image content
+          const imageContent = await drive.files.get(
+            { fileId: imageFile.id, alt: "media" },
+            { responseType: "stream" }
+          );
+          // Download and store the raw image
+          const destPath = `./images/${code}/${slugify(imageFile.name)}`;
+          const destStream = fs.createWriteStream(destPath);
+          await imageContent.data.pipe(destStream);
 
-        await new Promise((resolve, reject) => {
-          destStream.on("finish", resolve);
-          destStream.on("error", reject);
-        });
+          await new Promise((resolve, reject) => {
+            destStream.on("finish", resolve);
+            destStream.on("error", reject);
+          });
 
-        // Resize the image
-        sharp(destPath)
-          .resize(4600, 4400)
-          .toFile(
-            `./images/${code}/resized/${slugify(imageFile.name)}`,
-            async (err, info) => {
-              if (err) {
-                console.error("Error resizing image:", err);
-              } else {
-                const imageStream = fs.createReadStream(
-                  `./images/${code}/resized/${slugify(imageFile.name)}`
-                );
+          // Resize the image
+          sharp(destPath)
+            .resize(4600, 4400)
+            .toFile(
+              `./images/${code}/resized/${slugify(imageFile.name)}`,
+              async (err, info) => {
+                if (err) {
+                  console.error("Error resizing image:", err);
+                } else {
+                  const imageStream = fs.createReadStream(
+                    `./images/${code}/resized/${slugify(imageFile.name)}`
+                  );
 
-                // Push inputMediaPhoto
-                album.push({
-                  type: "photo",
-                  media: { source: imageStream },
-                  caption:
-                    i == imageFiles.length - 1
-                      ? `
+                  // Push inputMediaPhoto
+                  album.push({
+                    type: "photo",
+                    media: { source: imageStream },
+                    caption:
+                      i == imageFiles.length - 1
+                        ? `
                       🎉 Here they are! Resized a bit but, fresh like they were taken yesterday.
 
 Click <a href='https://drive.google.com/drive/folders/${studentFolder.id}'>here</a> to get them in their original high quality version from your dedicated Photo Album.
                       
                       `
-                      : "",
-                  parse_mode: "HTML",
-                });
-                // Update the last message sent by the bot to show the progress of the image upload
-                await ctx.telegram.editMessageText(
-                  ctx.chat.id,
-                  ctx.message.message_id + 1, // +1 since ctx.message.message_id will return the message id of the last text the user send, not the bot
-                  null,
-                  `Uploading [${i + 1} / ${imageFiles.length}] photos...⌛`
-                );
-                if (i == imageFiles.length - 1) {
-                  // Delete the last message of the bot after uploading the last image
-                  await ctx.telegram.deleteMessage(
-                    ctx.chat.id,
-                    ctx.message.message_id + 1
-                  );
-                  const chatId = ctx.update.message.chat.id;
-                  // Organize the images in a group of 10 or less
-                  const groupedArray = chunkArray(album, 10);
-                  for (let i = 0; i < groupedArray.length; i++) {
-                    // Send each grouped images to the user
-                    await ctx.telegram.sendMediaGroup(chatId, groupedArray[i]);
-                  }
-                  // Delete the folder and it's content created to temporarily store the student image
-                  fs.rm(`./images/${code}`, { recursive: true }, (err) => {
-                    if (err) {
-                      console.error(`Error deleting folder: ${err}`);
-                    } else {
-                      console.log(`Folder and its contents deleted.`);
-                    }
+                        : "",
+                    parse_mode: "HTML",
                   });
+                  // Update the last message sent by the bot to show the progress of the image upload
+                  await ctx.telegram.editMessageText(
+                    ctx.chat.id,
+                    ctx.message.message_id + 1, // +1 since ctx.message.message_id will return the message id of the last text the user send, not the bot
+                    null,
+                    `Uploading [${i + 1} / ${imageFiles.length}] photos...⌛`
+                  );
+                  if (i == imageFiles.length - 1) {
+                    // Delete the last message of the bot after uploading the last image
+                    await ctx.telegram.deleteMessage(
+                      ctx.chat.id,
+                      ctx.message.message_id + 1
+                    );
+                    const chatId = ctx.update.message.chat.id;
+                    // Organize the images in a group of 10 or less
+                    const groupedArray = chunkArray(album, 10);
+                    for (let i = 0; i < groupedArray.length; i++) {
+                      // Send each grouped images to the user
+                      await ctx.telegram.sendMediaGroup(
+                        chatId,
+                        groupedArray[i]
+                      );
+                    }
+                    // Delete the folder and it's content created to temporarily store the student image
+                    fs.rm(`./images/${code}`, { recursive: true }, (err) => {
+                      if (err) {
+                        console.error(`Error deleting folder: ${err}`);
+                      } else {
+                        console.log(`Folder and its contents deleted.`);
+                      }
+                    });
+                  }
+                  i += 1;
                 }
-                i += 1;
               }
-            }
-          );
+            );
+        } catch (e) {
+          continue;
+        }
       }
     } catch (e) {
       console.log(e);
