@@ -97,7 +97,7 @@ module.exports = {
                   media: { source: imageStream },
                   caption:
                     i == imageFiles.length - 1
-                      ? `<a href='https://drive.google.com/drive/folders/${studentFolder.id}'>Here's</a> your dedicated high quality photo album on google drive.`
+                      ? `<a href='https://drive.google.com/drive/folders/${studentFolder.id}'>Here's</a> your dedicated high quality photo album.`
                       : "",
                   parse_mode: "HTML",
                 });

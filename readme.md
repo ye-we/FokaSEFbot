@@ -52,7 +52,7 @@ First, make sure that you have the following installed on your machine:
 ### Important Scripts
 
 ```sh
-npm start  # Start the dev environment
+npm start  # Start your app
 
 ```
 
