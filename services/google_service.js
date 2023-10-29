@@ -107,7 +107,7 @@ Click <a href='https://drive.google.com/drive/folders/${studentFolder.id}'>here<
                   parse_mode: "HTML",
                 });
                 // Update the last message sent by the bot to show the progress of the image upload
-                await ctx.telegram.editMessageText(
+                ctx.telegram.editMessageText(
                   ctx.chat.id,
                   ctx.message.message_id + 1, // +1 since ctx.message.message_id will return the message id of the last text the user send, not the bot
                   null,
