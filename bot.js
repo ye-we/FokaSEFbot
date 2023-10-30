@@ -25,6 +25,16 @@ bot
     // When the bot first launches, fetch the student data from google-sheets and save it in memory
     const data = await loadFromSheets();
     setStudents(data);
+
+    ["328577765", "329828705"].forEach((chatId) => {
+      bot.telegram.sendMessage(
+        chatId,
+        `
+      👋 Your team photos are ready. Click  <a href="https://drive.google.com/drive/folders/16ZZaUhGDCRsNhrMM7awRJSW8218_vqHB?usp=drive_link">here</a> to view them now.
+      `,
+        { parse_mode: "HTML" }
+      );
+    });
   })
   .catch((err) => {
     console.log(err);
