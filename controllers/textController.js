@@ -16,7 +16,7 @@ module.exports = {
     if (ctx.session[userId].step == 1) {
       // Check whether or not the 6-digit code the user sent is valid (checked against the student data loaded from google-sheets)
       const student = getStudents().find(
-        (student) => student[0] == userText?.toUpperCase()
+        (student) => student[1] == userText?.toUpperCase()
       );
       if (!student) {
         return ctx.reply("Please provide a valid 6 Digit Code.");
