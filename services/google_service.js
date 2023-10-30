@@ -104,7 +104,6 @@ module.exports = {
 
 Click <a href='https://drive.google.com/drive/folders/${studentFolder.id}'>here</a> to get them in their original high quality version from your dedicated Photo Album.
                       
-And click <a href="https://drive.google.com/drive/folders/16ZZaUhGDCRsNhrMM7awRJSW8218_vqHB?usp=drive_link">here</a> to find your team photos.
                       `
                       : "",
                   parse_mode: "HTML",
