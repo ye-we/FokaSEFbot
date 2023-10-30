@@ -22,7 +22,7 @@ module.exports = {
         return ctx.reply("Please provide a valid 6 Digit Code.");
       }
       // Store the Fullname and the 6-digit code in the users session
-      ctx.session[userId].name = student[1];
+      ctx.session[userId].name = student[0];
       ctx.session[userId].code = userText.toUpperCase();
       ctx.session[userId].step += 1;
       return ctx.replyWithHTML(
